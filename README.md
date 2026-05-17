@@ -2,7 +2,7 @@
   <img src="https://github.com/user-attachments/assets/09bb74de-8576-4f90-a755-d168fe9420a5" width="300"/>
 </p>
 
-# ChessTime ♟️🫀
+# ChessTime ♟️
 
 **A multiplayer chess app built for long-distance couples.**  
 Play chess with your partner over a live video call, with an animated AI coach, in-game chat, and match history — all in real time.
