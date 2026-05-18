@@ -16,7 +16,7 @@ Play chess with your partner over a live video call, with an animated AI coach, 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/24510cd3-d1eb-45b8-aab4-29e1a9ec75d8" width="200" height="433"/>
   &nbsp;
-  <img src="https://github.com/user-attachments/assets/c0de1695-85bc-4ea8-9e04-8cd6c232224d" width="200" height="433"/>
+  <img src="https://github.com/user-attachments/assets/ad8d6e95-e349-410c-9bac-5eeb83f77759" width="200" height="433"/>
   &nbsp;
   <img src="https://github.com/user-attachments/assets/b33ae822-674d-47b6-bae9-6d0095c153a3" width="200" height="433"/>
   &nbsp;
