@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/cb883ab6-1d61-42d5-a257-5b49d4f68e91" width="150"/>
+  <img src="https://github.com/user-attachments/assets/1823bd4f-9f57-4d80-9298-7ebe69ddfa22" width="150"/>
 </p>
 
 # ChessTime ♟️
