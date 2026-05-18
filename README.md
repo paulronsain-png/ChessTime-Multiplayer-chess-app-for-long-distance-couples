@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="852" height="1847" alt="C9E8E476-9394-44E1-BB44-7C5750A537C5_1_201_a" src="https://github.com/user-attachments/assets/c0de1695-85bc-4ea8-9e04-8cd6c232224d" />
+  <img src="https://github.com/user-attachments/assets/cb883ab6-1d61-42d5-a257-5b49d4f68e91" width="150"/>
+</p>
 
 # ChessTime ♟️
 
@@ -15,7 +16,7 @@ Play chess with your partner over a live video call, with an animated AI coach, 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/24510cd3-d1eb-45b8-aab4-29e1a9ec75d8" width="200" height="433"/>
   &nbsp;
-  <img src="https://github.com/user-attachments/assets/70cebf79-950c-48ff-96cc-5fadeda2883b" width="200" height="433"/>
+  <img src="https://github.com/user-attachments/assets/c0de1695-85bc-4ea8-9e04-8cd6c232224d" width="200" height="433"/>
   &nbsp;
   <img src="https://github.com/user-attachments/assets/b33ae822-674d-47b6-bae9-6d0095c153a3" width="200" height="433"/>
   &nbsp;
