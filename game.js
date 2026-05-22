@@ -610,7 +610,8 @@ document.addEventListener('click', (e) => {
 function updateYappingVisibility(state) {
   const btn = document.getElementById('yapping-btn');
   if (!btn) return;
-  if (state.clocks.w === null) {
+  const inAIMode = !!document.getElementById('btn-ai')?.classList.contains('active');
+  if (inAIMode) {
     btn.classList.add('hidden');
     closeYappingMenu();
     closeQuickConvo();
@@ -766,6 +767,7 @@ function claimSeat(onDone) {
     avatarDataUrl: profile.avatarDataUrl || '',
     reunionPartnerEmail: String(profile.reunionPartnerEmail || '').trim().toLowerCase(),
     reunionAt: Number.isFinite(Number(profile.reunionAt)) ? Number(profile.reunionAt) : null,
+    loveMessage: String(profile.loveMessage || '').trim().slice(0, 80) || 'I love you ♥',
     connectedAt: Date.now()
   });
   const seatsRef = window.db.ref("games/" + GAME_ID + "/seats");
@@ -882,12 +884,16 @@ function listenToFirebase(stateRef, renderFn) {
     const isFirstLoad = lastAppliedUpdate === 0;
     if (isFirstLoad && data.yappingToastAt) window._lastYappingToast = data.yappingToastAt;
     if (isFirstLoad && data.loveAt) window._lastLoveAt = data.loveAt;
+    if (isFirstLoad) window.absorbRobotEvent?.(data.robotEvent);
 
     // Always check loveAt — it's written separately and doesn't update updatedAt
     if (!isFirstLoad && data.loveAt && data.loveAt > (window._lastLoveAt || 0)) {
       window._lastLoveAt = data.loveAt;
-      if (typeof window.showLoveOverlay === 'function') window.showLoveOverlay();
+      if (typeof window.showLoveOverlay === 'function') window.showLoveOverlay(data.loveMessage);
     }
+
+    // Always relay robot events — they have their own timestamp dedup in robot.js
+    if (!isFirstLoad) window.onRobotEvent?.(data.robotEvent);
 
     // Skip if we've already applied this version (our own write or a heartbeat)
     if (data.updatedAt && data.updatedAt <= lastAppliedUpdate) return;

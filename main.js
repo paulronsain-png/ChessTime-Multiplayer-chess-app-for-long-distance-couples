@@ -2,6 +2,10 @@ let state = null;
 Object.defineProperty(window, '_gameState', { get: () => state });
 let aiMode = false;
 
+function isAIModeSelected() {
+  return !!document.getElementById('btn-ai')?.classList.contains('active');
+}
+
 // ── Love heart interaction ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const heart   = document.getElementById('beating-heart');
@@ -10,9 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!heart || !overlay) return;
 
   let loveTimer = null;
+  function getLoveMessageFromProfile() {
+    const raw = window.currentProfile?.loveMessage;
+    const msg = String(raw || '').trim();
+    return msg ? Array.from(msg).slice(0, 80).join('') : 'I love you ♥';
+  }
 
-  window.showLoveOverlay = function() {
+  window.showLoveOverlay = function(message) {
     clearTimeout(loveTimer);
+    if (text) {
+      const msg = String(message || '').trim() || getLoveMessageFromProfile();
+      text.textContent = Array.from(msg).slice(0, 80).join('');
+    }
     overlay.classList.remove('hidden');
     text.classList.remove('fading');
     for (let i = 0; i < 28; i++) {
@@ -26,10 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   heart.style.cursor = 'pointer';
   heart.addEventListener('click', () => {
-    window.showLoveOverlay();
+    const loveMessage = getLoveMessageFromProfile();
+    window.showLoveOverlay(loveMessage);
+    window.walleReact?.('love');
     // Broadcast to other player
     if (window.db) {
-      window.db.ref('games/' + GAME_ID).update({ loveAt: Date.now() });
+      window.db.ref('games/' + GAME_ID).update({ loveAt: Date.now(), loveMessage });
     }
   });
 
@@ -88,7 +103,14 @@ document.getElementById('board').addEventListener('click', e => {
   if (!sq || !state) return;
   const r = parseInt(sq.dataset.r);
   const c = parseInt(sq.dataset.c);
+  const prevLen = state.moveHistory.length;
   handleSquareClick(state, r, c, aiMode, doAITurn);
+
+  if (state.moveHistory.length !== prevLen) {
+    window.hideRobotPanel?.();
+    window.walleReact?.('happy');
+  }
+
   if (!state.pendingPromo) render();
 });
 
@@ -164,7 +186,14 @@ document.getElementById('board').addEventListener('click', e => {
       const tc = parseInt(toSq.dataset.c);
       state.selected = [fr, fc];
       if (tr !== fr || tc !== fc) {
+        const prevLen2 = state.moveHistory.length;
         handleSquareClick(state, tr, tc, aiMode, doAITurn);
+
+        if (state.moveHistory.length !== prevLen2) {
+          window.hideRobotPanel?.();
+          window.walleReact?.('happy');
+        }
+
         if (!state.pendingPromo) render();
       } else {
         // Dropped on same square — treat as tap select
@@ -241,6 +270,26 @@ document.getElementById('btn-resign').addEventListener('click', () => {
     showModal('⚑', 'Resigned', `${loser} resigned. ${winner} wins!`);
     syncStateToFirebase(state);
   });
+});
+
+document.getElementById('btn-ask-robot').addEventListener('click', () => {
+  if (!state || state.gameOver) return;
+  if (typeof window.askRobot === 'function') {
+    window.askRobot(state);
+  }
+});
+
+// On mobile: move the robot button into the dedicated slot below the board
+if (window.innerWidth <= 600) {
+  const btn  = document.getElementById('btn-ask-robot');
+  const slot = document.getElementById('mobile-robot-slot');
+  if (btn && slot) slot.appendChild(btn);
+}
+
+document.getElementById('robot-panel-close').addEventListener('click', () => {
+  if (typeof window.hideRobotPanel === 'function') {
+    window.hideRobotPanel();
+  }
 });
 
 document.getElementById('btn-pvp').addEventListener('click', () => {
@@ -337,8 +386,8 @@ function robotAvatarDataUri() {
     </defs>
     <rect x="0" y="0" width="120" height="120" rx="60" fill="#0f2233"/>
     <rect x="30" y="28" width="60" height="44" rx="10" fill="url(#g)" stroke="#bde8ff" stroke-opacity="0.65" stroke-width="2"/>
-    <circle cx="48" cy="50" r="6" fill="#2f5f86"/>
-    <circle cx="72" cy="50" r="6" fill="#2f5f86"/>
+    <ellipse cx="48" cy="50" rx="7.8" ry="5.0" transform="rotate(-36 48 50)" fill="#2f5f86"/>
+    <ellipse cx="72" cy="50" rx="7.8" ry="5.0" transform="rotate(36 72 50)" fill="#2f5f86"/>
     <rect x="44" y="62" width="32" height="4" rx="2" fill="#2f5f86" fill-opacity="0.8"/>
     <rect x="36" y="80" width="48" height="24" rx="10" fill="url(#g)" stroke="#bde8ff" stroke-opacity="0.5" stroke-width="2"/>
     <rect x="56" y="18" width="8" height="10" rx="4" fill="#bde8ff"/>
@@ -348,7 +397,8 @@ function robotAvatarDataUri() {
 }
 
 function applyModeUI() {
-  const inAIMode = aiMode;
+  const inAIMode = aiMode || isAIModeSelected();
+  aiMode = inAIMode;
   if (inAIMode) {
     const me = window.currentProfile || {};
     const white = {
@@ -367,7 +417,7 @@ function applyModeUI() {
 window.setMultiplayerIdentity = function(nextIdentity = {}) {
   if (nextIdentity.w) seatIdentity.w = { ...seatIdentity.w, ...nextIdentity.w };
   if (nextIdentity.b) seatIdentity.b = { ...seatIdentity.b, ...nextIdentity.b };
-  if (!aiMode) applyCardIdentity(seatIdentity);
+  if (!(aiMode || isAIModeSelected())) applyCardIdentity(seatIdentity);
 };
 
 function applyPieceTheme(themeMode) {
